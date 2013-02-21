@@ -4,7 +4,7 @@ source "https://rubygems.org"
 #gem "sass"
 #gem "haml"
 #gem "tilt"
-#gem "grit"
+gem "grit"
 gem "trollop"
 
 #gem "term-ansicolor"
