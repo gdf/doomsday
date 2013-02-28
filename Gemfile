@@ -6,6 +6,7 @@ source "https://rubygems.org"
 #gem "tilt"
 gem "grit"
 gem "trollop"
+gem "chronic"
 
 #gem "term-ansicolor"
 
