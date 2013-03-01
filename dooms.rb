@@ -10,6 +10,7 @@ $: << File.dirname(__FILE__) + "/lib"
 require 'doom_events'
 
 class Events
+  attr_reader :events
   def initialize(repo)
     @repo = repo
     @events = nil
@@ -21,7 +22,6 @@ class Events
     else
       @events = {}
     end
-    return @events
   end
   def save
     FileUtils.mkdir_p(@repo, :verbose => true)
@@ -77,7 +77,10 @@ case cmd
   when "delete"
     Trollop::options {}
   when "list"
-    # blahk
+    $events.events.each do |id, e|
+      puts "[#{id}]"
+      pp e
+    end
   when "report"
     Trollop::options do
       # email?
