@@ -36,7 +36,8 @@ class Events
   end
 
   def save
-    FileUtils.mkdir_p(@repo, :verbose => true)
+    show_your_work = File.exists?(@repo)
+    FileUtils.mkdir_p(@repo, :verbose => show_your_work)
     fn = File.join(@repo, "events.json")
     open(fn, "w") do |f|
       f.print JSON.pretty_generate(@events)
@@ -64,6 +65,22 @@ class Events
       dstr = "#{days_from_now(day)}: #{day.strftime('%a, %b %d')}"
       block.call(dstr, byday[day])  
     end
+  end
+
+  def delete(id)
+    unless @events.has_key?(id)
+      raise "No such id #{id}"
+    end
+    @events.delete(id)
+    save
+  end
+
+  def remove_expired
+    today = Date.today
+    @events.delete_if do |id|
+      @events[id]["day"] < today
+    end
+    save
   end
 
 end

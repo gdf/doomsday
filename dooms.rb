@@ -38,7 +38,8 @@ case cmd
     puts "ok."
 
   when "delete"
-    Trollop::options {}
+    id = ARGV.shift || Trollop::die("<delete> needs id")
+    $events.delete(id)
 
   when "list"
     $events.events.each do |id, e|
@@ -49,7 +50,9 @@ case cmd
   when "report"
     cmd_opts = Trollop::options do
       opt :expire, "Remove expired events (where :day is in the past)"
+      opt :email, "Email to someone", :type=>:string
     end
+    $events.remove_expired if cmd_opts[:expire]
     $events.events_by_day do |day, events|
       puts "#{day}"
       events.each do |id, e|
