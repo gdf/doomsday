@@ -51,10 +51,11 @@ case cmd
       opt :expire, "Remove expired events (where :day is in the past)"
     end
     $events.events_by_day do |day, events|
-      puts "[#{day}]"
+      puts "#{day}"
       events.each do |id, e|
         puts "  #{e['event']} (##{id})"
       end
+      puts
     end
 
   else

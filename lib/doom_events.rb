@@ -1,5 +1,19 @@
 #!/ruby
 
+def days_from_now(date)
+  today = Date.today
+  diff = date.jd - today.jd
+  if diff < 0
+    "(already happend)"
+  elsif diff==0
+    "today"
+  elsif diff==1
+    "tomorrow"
+  else
+    "#{diff} days"
+  end
+end
+
 class Events
 
   attr_reader :events
@@ -13,6 +27,9 @@ class Events
     fn = File.join(@repo, "events.json")
     if File.exists?(fn)
       @events = JSON.parse(open(fn).read)
+      @events.each do |id,e|
+        e["day"] = Date.parse(e["day"])
+      end
     else
       @events = {}
     end
@@ -44,7 +61,8 @@ class Events
       byday[e["day"]][id] = e
     end
     byday.keys.sort.each do |day|
-      block.call(day, byday[day])  
+      dstr = "#{days_from_now(day)}: #{day.strftime('%a, %b %d')}"
+      block.call(dstr, byday[day])  
     end
   end
 
