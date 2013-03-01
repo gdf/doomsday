@@ -9,43 +9,6 @@ require 'pp'
 $: << File.dirname(__FILE__) + "/lib"
 require 'doom_events'
 
-class Events
-  attr_reader :events
-  def initialize(repo)
-    @repo = repo
-    @events = nil
-  end
-  def load
-    fn = File.join(@repo, "events.json")
-    if File.exists?(fn)
-      @events = JSON.parse(open(fn).read)
-    else
-      @events = {}
-    end
-  end
-  def save
-    FileUtils.mkdir_p(@repo, :verbose => true)
-    fn = File.join(@repo, "events.json")
-    open(fn, "w") do |f|
-      f.print JSON.pretty_generate(@events)
-    end 
-  end
-  def add(event)
-    nextId = @events.size + 1
-    while @events.has_key?(nextId.to_s)
-      nextId += 1
-    end 
-    @events[nextId.to_s] = event
-    save
-  end
-end
-
-# add --at <date-and-maybe-time> --event <thing> [<k>:<v>]?
-# edit <id>
-# delete <id>
-# list
-# (report) --expire
-
 global_opts = Trollop::options do
   banner "Impending Doom(s)"
   stop_on %w(add delete report)
@@ -76,17 +39,28 @@ case cmd
 
   when "delete"
     Trollop::options {}
+
   when "list"
     $events.events.each do |id, e|
       puts "[#{id}]"
       pp e
     end
+
   when "report"
-    Trollop::options do
-      # email?
+    cmd_opts = Trollop::options do
+      opt :expire, "Remove expired events (where :day is in the past)"
     end
+
   else
     Trollop::die "Unknown command #{cmd}"
   end
 
+
+# TODO:
+# - help usage for subcommads (...sucks)
+# - delete
+# - report
+#   - email
+#   - remove expired (--expire)
+# - git commit repo
 
