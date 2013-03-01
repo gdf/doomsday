@@ -5,35 +5,55 @@ require 'trollop'
 require 'net/smtp'
 require 'chronic'
 require 'json'
+require 'pp'
+$: << File.dirname(__FILE__) + "/lib"
+require 'doom_events'
 
-# add --at <timestamp> --event <thing> [<k>:<v>]?
+class Events
+  def initialize(repo)
+    @repo = repo
+    @events = nil
+  end
+  def load
+    fn = File.join(@repo, "events.json")
+    if File.exists?(fn)
+      @events = JSON.parse(open(fn).read)
+    else
+      @events = {}
+    end
+    return @events
+  end
+  def save
+    FileUtils.mkdir_p(@repo, :verbose => true)
+    fn = File.join(@repo, "events.json")
+    open(fn, "w") do |f|
+      f.print JSON.pretty_generate(@events)
+    end 
+  end
+  def add(event)
+    nextId = @events.size + 1
+    while @events.has_key?(nextId.to_s)
+      nextId += 1
+    end 
+    @events[nextId.to_s] = event
+    save
+  end
+end
+
+# add --at <date-and-maybe-time> --event <thing> [<k>:<v>]?
 # edit <id>
 # delete <id>
 # list
 # (report) --expire
-
-def database(repo)
-  fn = File.join(repo, "events.json")
-  if File.exists?(fn)
-    return JSON.parse(open(fn).read)
-  else
-    return {}
-  end
-end
-
-def save(repo, database)
-  FileUtils.mkdir_p(repo, :verbose => true)
-  fn = File.join(repo, "events.json")
-  open(fn, "w") do |f|
-    f.print database.to_json
-  end 
-end
 
 global_opts = Trollop::options do
   banner "Impending Doom(s)"
   stop_on %w(add delete report)
   opt :repo, "Dir for backing file", :type => :string, :default => "#{ENV['HOME']}/.doomsday"
 end
+
+$events = Events.new(global_opts[:repo])
+$events.load
 
 cmd = ARGV.shift || "report"
 case cmd 
@@ -42,14 +62,16 @@ case cmd
       opt :at, "Time this doom comes to pass", :short => 'a', :type => :string, :required => true
       opt :event, "Short description of this doom", :short => 'e', :type => :string, :required => true
     end
-    db = database(global_opts[:repo])
-    nextId = db.size + 1
-    while db.has_key?(nextId.to_s)
-      nextId += 1
-    end 
-    # no, convert @at to time and split to day and (opt) time
-    db[nextId.to_s] = cmd_opts
-    save(global_opts[:repo], db)
+    edate = Chronic.parse(cmd_opts[:at])
+    event = {
+      :event => cmd_opts[:event],
+      :day => edate.to_date.to_s,
+      :time => edate.strftime("%H:%M:%S"),
+      :_added => Time.now.to_s,
+    }
+    $events.add(event)
+    puts "Added:"
+    pp event
     puts "ok."
 
   when "delete"
