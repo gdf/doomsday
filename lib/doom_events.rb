@@ -83,5 +83,17 @@ class Events
     save
   end
 
+  def report
+    r = ""
+    $events.events_by_day do |day, events|
+      r << "#{day}\n"
+      events.each do |id, e|
+        r << "  #{e['event']} (##{id})\n"
+      end
+      r << "\n"
+    end
+    return r
+  end 
+
 end
 

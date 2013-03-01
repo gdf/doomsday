@@ -8,6 +8,7 @@ require 'json'
 require 'pp'
 $: << File.dirname(__FILE__) + "/lib"
 require 'doom_events'
+require 'emails'
 
 global_opts = Trollop::options do
   banner "Impending Doom(s)"
@@ -51,15 +52,16 @@ case cmd
     cmd_opts = Trollop::options do
       opt :expire, "Remove expired events (where :day is in the past)"
       opt :email, "Email to someone", :type=>:string
+      opt :smtpServer, "SMTP server", :type=>:string, :short => 'S'
+      opt :from, "From address", :default=>"doom-do-not-reply"
     end
     $events.remove_expired if cmd_opts[:expire]
-    $events.events_by_day do |day, events|
-      puts "#{day}"
-      events.each do |id, e|
-        puts "  #{e['event']} (##{id})"
-      end
-      puts
-    end
+    report = $events.report
+    if cmd_opts[:email]
+      email(report, "[[Impending DOOM]]", [cmd_opts[:email]], cmd_opts[:from], cmd_opts[:smtpServer])
+    else
+      print report 
+    end 
 
   else
     Trollop::die "Unknown command #{cmd}"
@@ -68,9 +70,5 @@ case cmd
 
 # TODO:
 # - help usage for subcommads (...sucks)
-# - delete
-# - report
-#   - email
-#   - remove expired (--expire)
 # - git commit repo
 
