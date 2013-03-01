@@ -27,10 +27,10 @@ case cmd
     end
     edate = Chronic.parse(cmd_opts[:at])
     event = {
-      :event => cmd_opts[:event],
-      :day => edate.to_date.to_s,
-      :time => edate.strftime("%H:%M:%S"),
-      :_added => Time.now.to_s,
+      "event" => cmd_opts[:event],
+      "day" => edate.to_date.to_s,
+      "time" => edate.strftime("%H:%M:%S"),
+      "_added" => Time.now.to_s,
     }
     $events.add(event)
     puts "Added:"
@@ -49,6 +49,12 @@ case cmd
   when "report"
     cmd_opts = Trollop::options do
       opt :expire, "Remove expired events (where :day is in the past)"
+    end
+    $events.events_by_day do |day, events|
+      puts "[#{day}]"
+      events.each do |id, e|
+        puts "  #{e['event']} (##{id})"
+      end
     end
 
   else

@@ -27,12 +27,25 @@ class Events
   end
 
   def add(event)
+    raise "missing 'event'" unless event.has_key? "event"
+    raise "missing 'day'" unless event.has_key? "day"
     nextId = @events.size + 1
     while @events.has_key?(nextId.to_s)
       nextId += 1
     end 
     @events[nextId.to_s] = event
     save
+  end
+
+  def events_by_day(&block)
+    byday = {}
+    @events.each do |id, e|
+      byday[e["day"]] ||= {}
+      byday[e["day"]][id] = e
+    end
+    byday.keys.sort.each do |day|
+      block.call(day, byday[day])  
+    end
   end
 
 end
