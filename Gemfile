@@ -8,7 +8,5 @@ gem "grit"
 gem "trollop"
 gem "chronic"
 
-#gem "term-ansicolor"
+gem "pony"
 
-# not webrick:
-#gem "thin" 
