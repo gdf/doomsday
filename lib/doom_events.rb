@@ -1,4 +1,5 @@
 #!/ruby
+require 'fileutils'
 
 def days_from_now(date)
   today = Date.today
