@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>DOOOOOOOM</title>
+    <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.3.custom.css" />
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/doomsday.css" />
+    <script type="text/javascript" src="js/underscore-1.4.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/knockout-2.2.1.js"></script>
+    <script type="text/javascript" src="js/doomsday.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      
+      <div>
+        <h3>Impending Dooooooooom</h3>
+      </div>
+
+      <div id="add-form" class="add-entry">
+        At: <input type="text" id="add-date" />
+        What: <input id="add-desc" type="text" />
+        <button class="btn btn-mini" id="add-btn">&plus;</button>
+      </div>  
+
+      <div class="entries">
+        <table class="table condensed">
+          <thead>
+            <th colspan="100">Portents</th>
+          </thead>
+          <tbody data-bind="foreach: events">
+            <tr>
+              <td data-bind="text: date">...</td>
+              <td data-bind="text: description">...</td>
+              <td><button class="btn btn-mini delete-event" data-bind="attr: { 'data-eventid': eventid }">&minus;</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </body>
+</html>
